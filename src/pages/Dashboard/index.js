@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [locationKey, setLocationKey] = useState('');
   const [teste, setTeste] = useState([]);
   const [city, setNameCity] = useState('');
+  const [fiveDays, setFiveDays] = useState([]);
 
   const key = '8MkR2dQdMuNbfZdA0jo2uu6uyOMEcdwn';
   const data = [1, 2, 3, 4, 5, 6];
@@ -61,6 +62,20 @@ export default function Dashboard() {
       .catch((err) => console.log(err));
   }, [locationKey]);
 
+  // Consulta Próximos 5 dias
+  useEffect(() => {
+    async function loadPreviewFivesDays() {
+      await api
+        .get(
+          `forecasts/v1/daily/5day/32256?apikey=8MkR2dQdMuNbfZdA0jo2uu6uyOMEcdwn&language=pt&details=trur&metric=true`,
+        )
+        .then((res) => setFiveDays(res.data.DailyForecasts))
+        .catch((err) => console.log('ERROR => ', err));
+    }
+
+    loadPreviewFivesDays();
+  }, []);
+
   return (
     <Container>
       <ScrollView style={{flex: 1}} horizontal={false}>
@@ -78,7 +93,7 @@ export default function Dashboard() {
         <ViewCity>
           <ViewCityDetails>
             <TextNameCity>
-              {locationKey.SupplementalAdminAreas[0].LocalizedName}
+              {/* {locationKey.SupplementalAdminAreas[0].LocalizedName} */}
             </TextNameCity>
             <Icon
               name="map-marker"
@@ -103,16 +118,17 @@ export default function Dashboard() {
         />
 
         <FlatList
-          data={data}
+          data={fiveDays}
           renderItem={({item}) => (
             <ViewDays>
+              {/* <Text>{JSON.stringify(item.Temperature.Maximum.Value)}</Text> */}
               <ViewDaysTesx>
                 <TextDays>Amanhã, 13 de abr</TextDays>
               </ViewDaysTesx>
               <ViewImage />
               <ViewMax>
-                <TextMaxDay>30</TextMaxDay>
-                <TextMinDay>/28</TextMinDay>
+                <TextMaxDay>{item.Temperature.Maximum.Value}</TextMaxDay>
+                <TextMinDay>/{item.Temperature.Minimum.Value}</TextMinDay>
               </ViewMax>
             </ViewDays>
           )}
